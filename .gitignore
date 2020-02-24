@@ -1,0 +1,22 @@
+# Compiled Sources #
+
+*.class
+*.dll
+*.exe
+*.o
+*.pyc
+
+
+# Packages #
+
+*.zip
+*.tar
+
+# Data #
+
+*.dat
+
+# Images #
+
+*.png
+
