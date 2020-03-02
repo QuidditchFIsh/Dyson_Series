@@ -57,9 +57,17 @@ def append_twoBody(H,op_freq_lst):
 				for ii in [-1,1]:
 					for jj in [-1,1]:
 						for kk in [-1,1]:
+							#There are alot of terms in this Hamiltonian. Need to think about how to throw away some of the terms.
 							freq = ii*i[1] + jj*j[1] + kk*k[1]
-							freq_strength = strs_two_body(jj*j[1],kk*k[1])
-							H.append([freq_strength*i[0]*j[0]*k[0],'cos(' + str(freq) + '*t) + (0 + 1j)*sin(' + str(freq)  + '*t)'])	
+							freq_strength = 1
+							#freq_strength = strs_two_body(jj*j[1],kk*k[1])
+							if (freq == 0): 
+							#Keep all of the terms which are non rotating
+								#H.append([freq_strength*i[0]*j[0]*k[0],'cos(' + str(freq) + '*t) + (0 + 1j)*sin(' + str(freq)  + '*t)'])	
+								H+=freq_strength*i[0]*j[0]*k[0]
+							#elif(freq_strength > 0.01):
+							#	H.append([freq_strength*i[0]*j[0]*k[0],'cos(' + str(freq) + '*t) + (0 + 1j)*sin(' + str(freq)  + '*t)'])	
+
 	return H
 
 
@@ -69,10 +77,14 @@ op_freq_lst 	= []
 op_freq_lst 	= append_op(g*q1	,omega1 	,g*q4 	,omega4 	,op_freq_lst)
 op_freq_lst 	= append_op(g*q2 	,omega2 	,g*q4 	,omega4 	,op_freq_lst)
 #op_freq_lst 	= append_op(EJ*q4	,omega4 	,I 		,omegad1 	,op_freq_lst) # Testing one body interactions
+#op_freq_lst 	= append_op(EJ*q4	,omega4 	,I 		,omegad2 	,op_freq_lst) # Testing one body interactions
 op_freq_lst 	= append_op3(EJ*q4	,omega4 	,EJ*q4 	,omega4 	,omegad12	,op_freq_lst) # Testing Two body interactions
-H 				= []
+op_freq_lst 	= append_op3(EJ*q4	,omega4 	,EJ*q4 	,omega4 	,omegad12d	,op_freq_lst) # Testing Two body interactions
+H 				= 0
 
-H = append_twoBody(H,op_freq_lst)
+#H = append_twoBody(H,op_freq_lst)
+H = (tensor(sigmax(),sigmax(),Id,Id))
+print(H)
 
 print("Integrating Hamiltonian")
 
