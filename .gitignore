@@ -5,6 +5,7 @@
 *.exe
 *.o
 *.pyc
+*.pyx
 
 
 # Packages #
