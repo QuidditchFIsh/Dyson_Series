@@ -6,7 +6,7 @@ from math import *
 import matplotlib.pyplot as plt
 import numpy as np
 from Output import *
-from Constants import *
+from Constants_2 import *
 from Plotting import *
 import time
 
@@ -32,25 +32,47 @@ def append_sin_drive_single(strength,drive,lst):
 	lst.append(['q4.dag() '	,(0+1j)*strength,q4.dag()	,+1*omega4 + drive])
 	return lst
 
-
-
+def Dyson_first_approx(str_op_freq_lst,H):
+	#loop over the operator list and combine each operator with another in the 
+	H0 = 0
+	for i in str_op_freq_lst:
+		for j in str_op_freq_lst:
+			#for each pair of operators in the list we need to create four pairs corresponding the each of the hermitian conjugates possible
+			op_lst 		= [i[2]*j[2],i[2].dag()*j[2],i[2]*j[2].dag(),i[2].dag()*j[2].dag()]
+			freq_lst 	= [-1*i[3] - j[3],i[3] - j[3],-1*i[3] + j[3],i[3] + j[3]]
+			str_lst 	= [i[2]*j[2]*(1),i[2]*j[2]*(-1),i[2]*j[2]*(-1),i[2]*j[2]*(1)]
+			for k in range(0,4):
+				if(freq_lst[k] == 0):
+					H.append([str_lst[k]*op_lst[k] ,'cos(' + str(freq_lst[k]) + '*t) + (0 + 1j)*sin(' + str(freq_lst[k]) + '*t)'])
+					H0 += op_lst[k]*str_lst[k]
+			
+	return [H,H0]
 #Defining Hamiltonian
 
 #First need to define the list of operators for this system. For the first approximation we will ony use the firs integral.
 print("Begining Two Body Simulation\nDefining Hamiltonian")
 
 str_op_freq_lst 	= [] # [names,strengths,operator,frequency]
-str_op_freq_lst 	= append_op(q1	,omega1,g, 'q1',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
+#str_op_freq_lst 	= append_op(q1	,omega1,g, 'q1',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 #str_op_freq_lst 	= append_op(q2 	,omega2,g, 'q2',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
-str_op_freq_lst 	= append_cos_drive_single(EJ,omega1,str_op_freq_lst)
+#str_op_freq_lst 	= append_cos_drive_single(EJ,omega1,str_op_freq_lst)
 
 #Now need to input this list of operators into methods to generate the sums in the Hamiltonian.
 #Will also add an anharmonic term to this system to ensure the lowest two levels are protected.
 
-H = [[U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2]]
-
+H = []
+lst.append(['q4 '		,strength,q4		,-1*omega4 - drive])
+lst.append(['q4 '	 	,strength,q4		,-1*omega4 + drive])
+lst.append(['q4.dag() '	,strength,q4.dag()	,+1*omega4 - drive])
+lst.append(['q4.dag() '	,strength,q4.dag()	,+1*omega4 + drive])
 # Now append the rest of the Dyson series expansion
+D1 = Dyson_first_approx(str_op_freq_lst,H)
+H = D1[0]
+H.append([U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2,'cos(' + str(0) + '*t) + (0 + 1j)*sin(' + str(0) + '*t)'])
+H1 = D1[1]
 
+print(H1)
+#print(inital_state)
 
 
 #Integrating Hamiltonian

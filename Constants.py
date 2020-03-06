@@ -18,7 +18,7 @@ omegad2 		= omega2
 omegad12		= omega1+omega2
 omegad12d		= omega1-omega2
 
-dim			 	= 3
+dim			 	= 2
 g 				= 0.5
 EJ 				= 0.05
 U 				= 0.1
