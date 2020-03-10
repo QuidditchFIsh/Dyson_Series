@@ -205,8 +205,8 @@ str_op_freq_lst 	= [] # [names,strengths,operator,frequency]
 str_op_freq_lst 	= append_op(q1	,omega1,g, 'q1',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 str_op_freq_lst 	= append_op(q2 	,omega2,g, 'q2',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 
-str_op_freq_lst 	= append_cos_drive_single(EJ,omega2,str_op_freq_lst)
-str_op_freq_lst 	= append_sin_drive_single_negitive(EJ,omega1,str_op_freq_lst)
+#str_op_freq_lst 	= append_cos_drive_single(EJ,omega2,str_op_freq_lst)
+#str_op_freq_lst 	= append_sin_drive_single_negitive(EJ,omega1,str_op_freq_lst)
 str_op_freq_lst 	= append_cos_sin_drive_double_negitive(EJ,omega2,omega1,str_op_freq_lst)
 
 #Now need to input this list of operators into methods to generate the sums in the Hamiltonian.
@@ -215,10 +215,11 @@ str_op_freq_lst 	= append_cos_sin_drive_double_negitive(EJ,omega2,omega1,str_op_
 H = []
 
 # Now append the rest of the Dyson series expansion
-D2 = Dyson_second_approx(str_op_freq_lst,H) 
-H = D2[0]
-H1 = D2[1]
-
+#D = Dyson_first_approx(str_op_freq_lst,H)
+D = Dyson_second_approx(str_op_freq_lst,H) 
+H = D[0]
+H1 = D[1] + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2
+#print(H1)
 H.append([U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2,'cos(' + str(0) + '*t) + (0 + 1j)*sin(' + str(0) + '*t)'])
 
 #print(H1)
@@ -230,17 +231,37 @@ H.append([U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2,'cos(' + str(0) 
 print("Integrating Hamiltonian")
 
 t1 = time.time()
-result = mesolve(H,inital_state,tlist1,c_ops,obs_ops,options=Options(nsteps = 20000,store_states = True)) # Perform the integration using qutip
+
+inital_state_00 	= tensor(zero_transformed,zero_transformed,zero_transformed)
+#inital_state_00 	= tensor(zero,zero,zero)
+result_00 = mesolve(H1,inital_state_00,tlist1,c_ops,obs_ops,options=Options(nsteps = 40000,store_states = True)) # Perform the integration using qutip
+
+#inital_state_01 	= tensor(zero_transformed,one_transformed,zero_transformed)
+#result_01 = mesolve(H,inital_state_01,tlist1,c_ops,obs_ops,options=Options(nsteps = 20000,store_states = True)) # Perform the integration using qutip
+
+#inital_state_10 	= tensor(one_transformed,zero_transformed,zero_transformed)
+#result_10 = mesolve(H,inital_state_10,tlist1,c_ops,obs_ops,options=Options(nsteps = 20000,store_states = True)) # Perform the integration using qutip
+
+inital_state_11 	= tensor(one_transformed,one_transformed,zero_transformed)
+#inital_state_11 	= tensor(one,one,zero)
+result_11 = mesolve(H1,inital_state_11,tlist1,c_ops,obs_ops,options=Options(nsteps = 40000,store_states = True)) # Perform the integration using qutip
+
 tf = time.time()
 print("Defining Hamiltonian Took:%f s"%(t1-t0))
 print("Integration Took:%f s"%(tf-t1))
 print("Simulation Took:%f"%(tf-t0))
 
 print("Outputing Results")
-out2(result)
+out2(result_00,'00')
+#out2(result_01,'01')
+#out2(result_10,'10')
+out2(result_11,'11')
 
 print("Plotting Results")
-plot_data(result)
+plot_data(result_00,'00')
+#plot_data(result_01,'01')
+#plot_data(result_10,'10')
+plot_data(result_11,'11')
 
 print("Done")
 print("===========================")

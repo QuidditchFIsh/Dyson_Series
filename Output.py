@@ -57,8 +57,8 @@ def out(result_1):
 
 
 
-def out2(result_1):
-	Output_str 		= 'Output/Data/'
+def out2(result_1,sim):
+	Output_str 		= 'Output/Data/'+ sim + '/'
 #Outputing Data
 	with open(Output_str + 'ocp_q1.dat','w') as fileq1:
 		for j in result_1.expect[0]:
