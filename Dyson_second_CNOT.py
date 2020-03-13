@@ -116,7 +116,7 @@ def append_cos_sin_drive_double(strength,drive1,drive2,lst):
 	return lst
 
 def append_cos_sin_drive_double_negitive(strength,drive1,drive2,lst):
-	lst.append(['q4q4 '					,strength,(0 + 1j) * q4*q4 							,-2*omega4 + drive1 + drive2])
+	lst.append(['q4q4 '					,strength,(0 + 1j)* q4*q4 							,-2*omega4 + drive1 + drive2])
 	lst.append(['q4q4 '					,strength,(0 - 1j)* q4*q4 							,-2*omega4 - drive1 - drive2])
 	lst.append(['q4q4 '					,strength,(0 + 1j)* q4*q4 							,-2*omega4 + drive1 - drive2])
 	lst.append(['q4q4 '					,strength,(0 - 1j)* q4*q4 							,-2*omega4 - drive1 + drive2])
@@ -141,10 +141,12 @@ def append_cos_sin_drive_double_negitive(strength,drive1,drive2,lst):
 
 def Dyson_first_approx(str_op_freq_lst,H):
 	#loop over the operator list and combine each operator with another in the 
+	#checked this against the theory and i am getting the correct predictions of strength!!
 	H0 = 0
 	for i in str_op_freq_lst:
 		for j in str_op_freq_lst:
 			#for each pair of operators in the list we need to create four pairs corresponding the each of the hermitian conjugates possible
+
 			op_lst 		= [i[2]*j[2]		,i[2].dag()*j[2]		,i[2]*j[2].dag()	,i[2].dag()*j[2].dag()]
 			freq_lst 	= [-1*i[3] - j[3]	,i[3] - j[3]			,-1*i[3] + j[3]		,i[3] + j[3]]
 			str_lst 	= [i[1]*j[1]*(-1/j[3])	,i[1]*j[1]*(-1/j[3])			,i[1]*j[1]*(1/j[3])			,i[1]*j[1]*(1/j[3])]
@@ -152,12 +154,15 @@ def Dyson_first_approx(str_op_freq_lst,H):
 				if(freq_lst[k] == 0):
 					H.append([str_lst[k]*op_lst[k] ,'cos(' + str(freq_lst[k]) + '*t) + (0 + 1j)*sin(' + str(freq_lst[k]) + '*t)'])
 					H0 += op_lst[k]*str_lst[k]
+					print(str_lst[k])
+					#print(op_lst[k]*str_lst[k])
 					#print(i[0],j[0],str_lst[k])
 			
 	return [H,H0]
 
 def Dyson_second_approx(str_op_freq_lst,H):
 	H0 = 0
+	'''
 	for i in str_op_freq_lst:
 		for j in str_op_freq_lst:
 			#for each pair of operators in the list we need to create four pairs corresponding the each of the hermitian conjugates possible
@@ -167,9 +172,10 @@ def Dyson_second_approx(str_op_freq_lst,H):
 			for k in range(0,4):
 				if(freq_lst[k] == 0):
 					H.append([str_lst[k]*op_lst[k] ,'cos(' + str(freq_lst[k]) + '*t) + (0 + 1j)*sin(' + str(freq_lst[k]) + '*t)'])
-					H0 += op_lst[k]*str_lst[k]
+					#H0 += op_lst[k]*str_lst[k]
+					H0 += op_lst[k]#TESTING
 					#print(i[0],j[0],str_lst[k])
-
+	'''
 	for i in str_op_freq_lst:
 		for j in str_op_freq_lst:
 			for k in str_op_freq_lst:
@@ -193,7 +199,8 @@ def Dyson_second_approx(str_op_freq_lst,H):
 				for l in range(0,8):
 					if(freq_lst[l] == 0):
 						H.append([str_lst[l]*op_lst[l] ,'cos(' + str(freq_lst[l]) + '*t) + (0 + 1j)*sin(' + str(freq_lst[l]) + '*t)'])
-						H0 += op_lst[l]*str_lst[l]
+						#H0 += op_lst[l]*str_lst[l]
+						H0 += op_lst[l]*0.01#TESTING
 	return [H,H0]
 				
 #Defining Hamiltonian
@@ -205,7 +212,7 @@ str_op_freq_lst 	= [] # [names,strengths,operator,frequency]
 str_op_freq_lst 	= append_op(q1	,omega1,g, 'q1',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 str_op_freq_lst 	= append_op(q2 	,omega2,g, 'q2',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 
-#str_op_freq_lst 	= append_cos_drive_single(EJ,omega2,str_op_freq_lst)
+#str_op_freq_lst 	= append_cos_drive_single(EJ,omega1,str_op_freq_lst)
 #str_op_freq_lst 	= append_sin_drive_single_negitive(EJ,omega1,str_op_freq_lst)
 str_op_freq_lst 	= append_cos_sin_drive_double_negitive(EJ,omega2,omega1,str_op_freq_lst)
 
@@ -219,9 +226,21 @@ H = []
 D = Dyson_second_approx(str_op_freq_lst,H) 
 H = D[0]
 H1 = D[1] + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2
-#print(H1)
-H.append([U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2,'cos(' + str(0) + '*t) + (0 + 1j)*sin(' + str(0) + '*t)'])
+print(H1.full())
+H2 = (q1 + q1.dag()) * (q2 + q2.dag())
+with open('Hamiltonian.dat','w') as ham:
+	for i in H1.full():
+		for j in i:
+			ham.write(str(round(j.real,2)) + " ")
+		ham.write("\n")
+with open('Hamiltonian_real.dat','w') as ham:
+	for i in H2.full():
+		for j in i:
+			ham.write(str(round(j.real,2)) + " ")
+		ham.write("\n")
 
+H.append([U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2,'cos(' + str(0) + '*t) + (0 + 1j)*sin(' + str(0) + '*t)'])
+print(H2)
 #print(H1)
 #print((q1+q1.dag())*(q2+q2.dag()))
 #print(inital_state)

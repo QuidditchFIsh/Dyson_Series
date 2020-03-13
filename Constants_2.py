@@ -11,7 +11,7 @@ pi 				= 0.5#3.14159265358979323
 omega1 			= 4
 omega2 			= 5
 omega3 			= 7
-omega4 			= 2
+omega4 			= 8
 
 omegad1			= omega1
 omegad2 		= omega2 
@@ -19,9 +19,10 @@ omegad12		= omega1+omega2
 omegad12d		= omega1-omega2
 
 dim			 	= 3
-g 				= 0.01
+g 				= 0.1
 EJ 				= 1
-U 				= 0.5
+U 				= 
+spin 			= (dim-1)*0.5
 
 Id 				= qeye(dim)
 I 				= tensor(qeye(dim),qeye(dim),qeye(dim))
@@ -37,12 +38,13 @@ q4 				= tensor(qeye(dim),qeye(dim),a)
 one 			= basis(dim,1)
 zero 			= basis(dim,0)
 
-zero_transformed = (1/sqrt(2))*(zero + (0 + 1j)*one)
-one_transformed = (1/sqrt(2))*(zero - (0 + 1j)*one)
+
+zero_transformed 	= (1/sqrt(2)) * (zero + (0+1j)*one)
+one_transformed 	= (1/sqrt(2)) * (zero - (0+1j)*one)
 
 #operators to measure
-spin = (dim-1)*0.5
-scale = 1
+
+scale = sqrt(2)
 sx1 			= scale*tensor(jmat(spin,'x'),Id,Id)
 sx2 			= scale*tensor(Id,jmat(spin,'x'),Id)
 sx4 			= scale*tensor(Id,Id,jmat(spin,'x'))
@@ -59,7 +61,7 @@ sz4 			= scale*tensor(Id,Id,jmat(spin,'z'))
 
 #inital_state 	= tensor(one_transformed,zero_transformed,zero_transformed)
 inital_state 	= tensor(zero,zero,zero)
-tlist1 			= np.linspace(0,4000,200) # time to integrate over
+tlist1 			= np.linspace(0,50,2000) # time to integrate over
 obs_ops 		=[q1.dag()*q1,q2.dag()*q2,q4.dag()*q4,sx1,sx2,sx4,sy1,sy2,sy4,sz1,sz2,sz4]
 c_ops 			= []
 

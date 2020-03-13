@@ -1,48 +1,48 @@
+
 from qutip import *
 from math import *
 import matplotlib.pyplot as plt
 import numpy as np
 from Output import *
+from Constants_2 import *
 from Plotting import *
 import time
 
-#Testing script for some ideas
+T1 = +1 * q1 * q4 * q2 * q4 * q4.dag() * q4.dag() -1 * q1.dag() * q4 * q2 * q4 * q4.dag() * q4.dag() +1 * q1 * q4 * q2.dag() * q4 * q4.dag() * q4.dag() -1 * q1.dag() * q4 * q2.dag() * q4 * q4.dag() * q4.dag()
+T2 = -1 * q1 * q4 * q2 * q4.dag() * q4 * q4.dag() +1 * q1.dag() * q4 * q2 * q4.dag() * q4 * q4.dag() -1 * q1 * q4 * q2.dag() * q4.dag() * q4 * q4.dag() +1 * q1.dag() * q4 * q2.dag() * q4.dag() * q4 * q4.dag()
+T3 = -1 * q1 * q4.dag() * q2 * q4 * q4 * q4.dag() +1 * q1.dag() * q4.dag() * q2 * q4 * q4 * q4.dag() -1 * q1 * q4.dag() * q2.dag() * q4 * q4 * q4.dag() +1 * q1.dag() * q4.dag() * q2.dag() * q4 * q4 * q4.dag()
+T4 = -1 * q1 * q4 * q2 * q4.dag() * q4.dag() * q4 +1 * q1.dag() * q4 * q2 * q4.dag() * q4.dag() * q4 -1 * q1 * q4 * q2.dag() * q4.dag() * q4.dag() * q4 +1 * q1.dag() * q4 * q2.dag() * q4.dag() * q4.dag() * q4
+T5 = -1 * q1 * q4.dag() * q2 * q4 * q4.dag() * q4 +1 * q1.dag() * q4.dag() * q2 * q4 * q4.dag() * q4 -1 * q1 * q4.dag() * q2.dag() * q4 * q4.dag() * q4 +1 * q1.dag() * q4.dag() * q2.dag() * q4 * q4.dag() * q4
+T6 = +1 * q1 * q4.dag() * q2 * q4.dag() * q4 * q4 -1 * q1.dag() * q4.dag() * q2 * q4.dag() * q4 * q4 +1 * q1 * q4.dag() * q2.dag() * q4.dag() * q4 * q4 -1 * q1.dag() * q4.dag() * q2.dag() * q4.dag() * q4 * q4
+'''
+T1 = +1 * q1 * q4 * q4.dag() 
+T2 = -1 * q1 * q4.dag()  * q4 
+T3 = 0
+T4 = 0
+T5 = 0
+T6 = 0
+'''
 
-dim = 3
-a 				= destroy(dim)
+H1 = (0-1j)*(T1 + T2 + T3 + T4 + T5 + T6) + (q2 + q2.dag()) - (0+1j)*(q1 - q1.dag()) + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2
+H2 = (0-1j)*(q1-q1.dag())*(q2+q2.dag()) + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2
 
-q1 				= tensor(a,qeye(dim))
-#q2 				= tensor(qeye(dim),a,qeye(dim))
-q4 				= tensor(qeye(dim),a)
+with open('Hamiltonian.dat','w') as ham:
+	for i in H1.full():
+		for j in i:
+			ham.write(str(round(j.real,2)) + " ")
+		ham.write("\n")
+with open('Hamiltonian_real.dat','w') as ham:
+	for i in H2.full():
+		for j in i:
+			ham.write(str(round(j.real,2)) + " ")
+		ham.write("\n")
+inital_state_11 	= tensor(one_transformed,one_transformed,zero_transformed)
+#inital_state_11 	= tensor(zero,zero,zero)
+result_11 = mesolve(H1,inital_state_11,tlist1,c_ops,obs_ops,options=Options(nsteps = 40000,store_states = True)) # Perform the integration using qutip
 
-H = q1*q4*q4.dag() - q1*q4.dag()*q4 + q1.dag()*q4*q4.dag() -q1.dag()*q4.dag()*q4 
-print(H)
-#H = q1 + q1.dag()
-one 			= basis(dim,1)
-zero 			= basis(dim,0)
+inital_state_00 	= tensor(zero_transformed,zero_transformed,zero_transformed)
+#inital_state_00 	= tensor(zero,zero,zero)
+result_00 = mesolve(H1,inital_state_00,tlist1,c_ops,obs_ops,options=Options(nsteps = 40000,store_states = True)) # Perform the integration using qutip
 
-inital_state 	= tensor(one,zero)
-tlist1 			= np.linspace(0,10,500) # time to integrate over
-obs_ops 		=[q1.dag()*q1,q4.dag()*q4]
-c_ops 			= []
-
-
-print("Integrating Hamiltonian")
-
-t0 = time.time() 
-result_1 = mesolve(H,inital_state,tlist1,c_ops,obs_ops,options=Options(nsteps = 20000,store_states = True)) # Perform the integration using qutip
-t1 = time.time()
-print("Simulation Took:%f s"%(t1-t0))
-
-print("Outputing Results")
-Output_str 		= 'Output/Data/'
-#Outputing Data
-with open(Output_str + 'ocp_q1.dat','w') as fileq1:
-	for j in result_1.expect[0]:
-		fileq1.write(str(j) + "\n")
-
-with open(Output_str + 'ocp_q4.dat','w') as fileq4:
-	for j in result_1.expect[1]:
-		fileq4.write(str(j) + "\n")
-
-
+out2(result_11,'11')
+out2(result_00,'00')
