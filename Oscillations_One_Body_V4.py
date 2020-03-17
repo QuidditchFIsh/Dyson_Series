@@ -46,7 +46,7 @@ def Dyson_first_approx(str_op_freq_lst,H):
 					H.append([str_lst[k]*op_lst[k] ,'cos(' + str(freq_lst[k]) + '*t) + (0 + 1j)*sin(' + str(freq_lst[k]) + '*t)'])
 					H0 += op_lst[k]*str_lst[k]
 					#print(i[0],j[0],str_lst[k])
-				elif((str_lst[k])/(j[3]*freq_lst[k]) > 0.005):
+				elif((str_lst[k])/(j[3]*freq_lst[k]) > 0.00000001):
 					H.append([str_lst[k]*op_lst[k] ,'cos(' + str(freq_lst[k]) + '*t) + (0 + 1j)*sin(' + str(freq_lst[k]) + '*t)'])
 					H0 += op_lst[k]*str_lst[k]
 					#print("welp")
@@ -60,8 +60,8 @@ print("Begining Two Body Simulation\nDefining Hamiltonian")
 str_op_freq_lst 	= [] # [names,strengths,operator,frequency]
 str_op_freq_lst 	= append_op(q1	,omega1,g, 'q1',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 str_op_freq_lst 	= append_op(q2 	,omega2,g, 'q2',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
-str_op_freq_lst 	= append_sin_drive_single(EJ,omega1,str_op_freq_lst)
-#str_op_freq_lst 	= append_cos_drive_single(EJ,omega2,str_op_freq_lst)
+#str_op_freq_lst 	= append_sin_drive_single(EJ,omega1,str_op_freq_lst)
+str_op_freq_lst 	= append_cos_drive_single(EJ,omega2,str_op_freq_lst)
 
 #Now need to input this list of operators into methods to generate the sums in the Hamiltonian.
 #Will also add an anharmonic term to this system to ensure the lowest two levels are protected.

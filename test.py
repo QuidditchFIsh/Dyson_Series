@@ -23,9 +23,9 @@ T5 = 0
 T6 = 0
 '''
 
-H1 = (0-1j)*(T1 + T2 + T3 + T4 + T5 + T6) + (q2 + q2.dag()) - (0+1j)*(q1 - q1.dag()) + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2
-H2 = (0-1j)*(q1-q1.dag())*(q2+q2.dag()) + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2
-
+H1 = (0-0.2j)*(T1 + T2 + T3 + T4 + T5 + T6)  + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2 + 0.1*(q2 + q2.dag()) + (0-0.1j)*(q1 - q1.dag())
+H2 = (0-0.2j)*(q1-q1.dag())*(q2+q2.dag()) + U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2+ 0.2*(q2 + q2.dag()) + (0-0.2j)*(q1 - q1.dag())
+'''
 with open('Hamiltonian.dat','w') as ham:
 	for i in H1.full():
 		for j in i:
@@ -36,8 +36,9 @@ with open('Hamiltonian_real.dat','w') as ham:
 		for j in i:
 			ham.write(str(round(j.real,2)) + " ")
 		ham.write("\n")
+'''
 inital_state_11 	= tensor(one_transformed,one_transformed,zero_transformed)
-#inital_state_11 	= tensor(zero,zero,zero)
+#inital_state_11 	= tensor(one,one,zero)
 result_11 = mesolve(H1,inital_state_11,tlist1,c_ops,obs_ops,options=Options(nsteps = 40000,store_states = True)) # Perform the integration using qutip
 
 inital_state_00 	= tensor(zero_transformed,zero_transformed,zero_transformed)

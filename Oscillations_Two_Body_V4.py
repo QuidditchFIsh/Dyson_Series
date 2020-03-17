@@ -193,7 +193,7 @@ def Dyson_second_approx(str_op_freq_lst,H):
 				for l in range(0,8):
 					if(freq_lst[l] == 0):
 						H.append([str_lst[l]*op_lst[l] ,'cos(' + str(freq_lst[l]) + '*t) + (0 + 1j)*sin(' + str(freq_lst[l]) + '*t)'])
-						H0 += op_lst[l]*str_lst[l]
+						H0 += op_lst[l]*0.1
 	return [H,H0]
 				
 #Defining Hamiltonian
@@ -205,8 +205,8 @@ str_op_freq_lst 	= [] # [names,strengths,operator,frequency]
 str_op_freq_lst 	= append_op(q1	,omega1,g, 'q1',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 str_op_freq_lst 	= append_op(q2 	,omega2,g, 'q2',q4 	,omega4 ,1,'q4' 	,str_op_freq_lst)
 
-str_op_freq_lst 	= append_cos_drive_single(EJ,omega2,str_op_freq_lst)
-str_op_freq_lst 	= append_sin_drive_single_negitive(EJ,omega1,str_op_freq_lst)
+#str_op_freq_lst 	= append_cos_drive_single(EJ,omega2,str_op_freq_lst)
+#str_op_freq_lst 	= append_sin_drive_single_negitive(EJ,omega1,str_op_freq_lst)
 str_op_freq_lst 	= append_cos_sin_drive_double_negitive(EJ,omega2,omega1,str_op_freq_lst)
 
 #Now need to input this list of operators into methods to generate the sums in the Hamiltonian.
@@ -220,7 +220,7 @@ H = D2[0]
 H1 = D2[1]
 
 H.append([U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2,'cos(' + str(0) + '*t) + (0 + 1j)*sin(' + str(0) + '*t)'])
-
+H1 += U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2
 #print(H1)
 #print((q1+q1.dag())*(q2+q2.dag()))
 #print(inital_state)
@@ -230,7 +230,7 @@ H.append([U*q1.dag()*q1.dag()*q1*q1 + U*q2.dag()*q2.dag()*q2*q2,'cos(' + str(0) 
 print("Integrating Hamiltonian")
 
 t1 = time.time()
-result = mesolve(H,inital_state,tlist1,c_ops,obs_ops,options=Options(nsteps = 20000,store_states = True)) # Perform the integration using qutip
+result = mesolve(H1,inital_state,tlist1,c_ops,obs_ops,options=Options(nsteps = 20000,store_states = True)) # Perform the integration using qutip
 tf = time.time()
 print("Defining Hamiltonian Took:%f s"%(t1-t0))
 print("Integration Took:%f s"%(tf-t1))
